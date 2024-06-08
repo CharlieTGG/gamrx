@@ -1,0 +1,38 @@
+body {
+    background-color: blueviolet;
+    text-align: center;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+h1 {
+    color: white;
+    text-decoration: underline;
+    text-decoration-color: plum;
+    text-decoration-thickness: 5px;
+    font-weight: bold;
+}
+
+h2 {
+    color: aliceblue;
+}
+
+h3 {
+    color: azure;
+}
+
+a {
+    font-size: 25px;
+    font-family: 'Times New Roman', Times, serif;
+    color: blue;
+    font-weight: 750;
+}
+
+p {
+    font-size: 20px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: aquamarine;
+}
+
+.credit {
+    color: grey;
+}
