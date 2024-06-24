@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="top-right-button">
+        <button onclick="goToHomePage()">Home</button>
+    </div>    
+    <div class="admin-panel">
+        <h1>Admin Panel</h1>
+        <div class="admin-section">
+            <h2>Manage Users</h2>
+            <div id="userList" class="user-list">
+                <!-- User list will be populated here -->
+            </div>
+        </div>
+        <div class="admin-section">
+            <div id="userSettings">
+                <!-- User settings form will be populated here -->
+            </div>
+        </div>
+        <div class="admin-section">
+            <h3>Add New Admin</h3>
+            <form id="addAdminForm" class="admin-form">
+                <label for="newAdminUsername">Username:</label>
+                <input type="text" id="newAdminUsername" required>
+                <button type="submit">Add Admin</button>
+            </form>
+        </div>
+        <div class="admin-section">
+            <button id="clearAllUsersButton">Clear All Users</button>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>
