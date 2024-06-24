@@ -232,3 +232,74 @@ function isAdmin(username) {
     const user = users.find(user => user.username === username);
     return user && user.role === 'admin';
 }
+
+// Function to hash a password
+async function hashPassword(password) {
+    const saltRounds = 10; // Number of salt rounds (higher is slower but more secure)
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    return { hashedPassword, salt };
+}
+
+// Function to verify a password against a hashed password and salt
+async function verifyPassword(password, hashedPassword, salt) {
+    const isValid = await bcrypt.compare(password, hashedPassword);
+    return isValid;
+}
+
+// Handle Sign Up
+document.getElementById('signupForm')?.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    let users = fetchUsers();
+    if (users.some(user => user.username === username)) {
+        alert('Username already exists');
+        return;
+    }
+
+    const { hashedPassword, salt } = await hashPassword(password);
+
+    const user = {
+        username: username,
+        hashedPassword: hashedPassword,
+        salt: salt,
+        role: 'user', // Default role is user
+        banned: false
+    };
+
+    users.push(user);
+    saveUsers(users);
+    alert('Account created successfully.');
+    window.location.href = 'index.html'; // Redirect to login page
+});
+
+// Handle Login
+document.getElementById('loginForm')?.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    const users = fetchUsers();
+    const user = users.find(user => user.username === username);
+
+    if (user) {
+        const isValidPassword = await verifyPassword(password, user.hashedPassword, user.salt);
+
+        if (!isValidPassword) {
+            alert('Invalid username or password');
+            return;
+        }
+
+        if (user.banned) {
+            alert('You are banned from this platform.');
+            return;
+        }
+
+        sessionStorage.setItem('loggedInUser', username); // Mark user as logged in for the session
+        window.location.href = 'home.html'; // Redirect to home page
+    } else {
+        alert('Invalid username or password');
+    }
+});
