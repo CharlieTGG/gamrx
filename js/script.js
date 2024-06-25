@@ -44,6 +44,49 @@ function isAdmin(username) {
     return user && user.role === 'admin';
 }
 
+// Function to fetch and apply the theme
+function applyTheme(theme) {
+    document.body.className = ''; // Clear existing classes
+    document.body.classList.add(theme);
+    localStorage.setItem('selectedTheme', theme);
+}
+
+// Function to get and apply the saved theme
+function getSavedTheme() {
+    return localStorage.getItem('selectedTheme') || 'light-theme';
+}
+
+// Function to reset the theme to default
+function resetTheme() {
+    localStorage.removeItem('selectedTheme');
+    applyTheme('light-theme');
+}
+
+// Add theme dropdown to the top right of the page
+function addThemeDropdown() {
+    const themeDropdownDiv = document.createElement('div');
+    themeDropdownDiv.classList.add('top-right-theme');
+    themeDropdownDiv.innerHTML = `
+        <select id="themeSelect" onchange="changeTheme()">
+            <option value="light-theme">Light</option>
+            <option value="dark-theme">Dark</option>
+            <option value="dyslexic-theme">Dyslexic</option>
+            <option value="colorblind-theme">Colorblind</option>
+        </select>
+    `;
+    document.body.appendChild(themeDropdownDiv);
+
+    // Set selected value based on the current theme
+    const currentTheme = getSavedTheme();
+    document.getElementById('themeSelect').value = currentTheme;
+}
+
+// Function to change theme based on selection
+function changeTheme() {
+    const selectedTheme = document.getElementById('themeSelect').value;
+    applyTheme(selectedTheme);
+}
+
 // Event listener for DOM content loaded
 document.addEventListener('DOMContentLoaded', function () {
     const loggedInUser = sessionStorage.getItem('loggedInUser');
@@ -54,11 +97,15 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = 'home.html';
         } else if (path.endsWith('admin.html') && !isAdmin(loggedInUser)) {
             window.location.href = 'home.html';
+        } else {
+            applyTheme(getSavedTheme());
+            addThemeDropdown();
         }
     } else {
         if (path.endsWith('home.html') || path.endsWith('admin.html')) {
             window.location.href = 'index.html';
         }
+        resetTheme();
     }
 
     if (path.endsWith('admin.html')) {
@@ -72,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (path.endsWith('settings.html')) {
         populateUserSettings(loggedInUser);
+        addThemeDropdown(); // Add theme dropdown to settings page
     }
 
     if (!path.endsWith('index.html') && !path.endsWith('signup.html') && !path.endsWith('login.html')) {
@@ -138,6 +186,7 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
 // Handle Sign Out
 document.getElementById('signOutButton')?.addEventListener('click', function () {
     sessionStorage.removeItem('loggedInUser');
+    resetTheme();
     window.location.href = 'index.html';
 });
 
@@ -175,10 +224,26 @@ function populateUserSettings(username) {
                 <input type="text" id="username" value="${user.username}" disabled>
                 <label for="newPassword">New Password:</label>
                 <input type="password" id="newPassword" required>
+                <label for="themeSelectSettings">Theme:</label>
+                <select id="themeSelectSettings">
+                    <option value="light-theme">Light</option>
+                    <option value="dark-theme">Dark</option>
+                    <option value="dyslexic-theme">Dyslexic</option>
+                    <option value="colorblind-theme">Colorblind</option>
+                </select>
                 <button type="submit">Update Password</button>
                 <button id="deleteAccountButton" type="button">Delete Account</button>
             </form>
         `;
+
+        // Set theme selection value
+        document.getElementById('themeSelectSettings').value = getSavedTheme();
+
+        // Add event listener for theme change
+        document.getElementById('themeSelectSettings').addEventListener('change', function () {
+            const selectedTheme = this.value;
+            applyTheme(selectedTheme);
+        });
 
         document.getElementById('userSettingsForm').addEventListener('submit', function (e) {
             e.preventDefault();
