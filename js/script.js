@@ -1,54 +1,34 @@
-// Ensure users are fetched from the common storage
+// Import bcrypt library for password hashing and verification
+const bcrypt = require('bcryptjs');
+
+// Function to fetch users from localStorage
 function fetchUsers() {
     return JSON.parse(localStorage.getItem('users')) || [];
 }
 
+// Function to save users to localStorage
 function saveUsers(users) {
     localStorage.setItem('users', JSON.stringify(users));
 }
 
-// Redirect to home or index based on session
-document.addEventListener('DOMContentLoaded', function () {
-    const loggedInUser = sessionStorage.getItem('loggedInUser');
+// Function to hash a password using bcrypt
+async function hashPassword(password) {
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    return { hashedPassword, salt };
+}
 
-    if (loggedInUser) {
-        if (window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('signup.html') || window.location.pathname.endsWith('login.html')) {
-            window.location.href = 'home.html';
-        } else if (window.location.pathname.endsWith('admin.html') && !isAdmin(loggedInUser)) {
-            window.location.href = 'home.html';
-        }
-    } else {
-        if (window.location.pathname.endsWith('home.html')) {
-            window.location.href = 'index.html';
-        } else if (window.location.pathname.endsWith('admin.html')) {
-            window.location.href = 'index.html';
-        }
-    }
+// Function to verify a password
+async function verifyPassword(password, hashedPassword) {
+    return await bcrypt.compare(password, hashedPassword);
+}
 
-    if (window.location.pathname.endsWith('admin.html')) {
-        populateUserList();
-        populateUserSettings(loggedInUser);
-    }
-
-    if (window.location.pathname.endsWith('home.html')) {
-        displayUserData(loggedInUser);
-    }
-
-    if (window.location.pathname.endsWith('settings.html')) {
-        populateUserSettings(loggedInUser);
-    }
-
-    // Add the Home button to all pages except index, signup, and login
-    if (!window.location.pathname.endsWith('index.html') && !window.location.pathname.endsWith('signup.html') && !window.location.pathname.endsWith('login.html')) {
-        addHomeButton();
-    }
-});
-
-// Add a Home button to the top right corner
+// Function to add a Home button to the top right of the page
 function addHomeButton() {
     const homeButtonDiv = document.createElement('div');
     homeButtonDiv.classList.add('top-right-button');
-    homeButtonDiv.innerHTML = `<button onclick="goToHomePage()">Home</button>`;
+    homeButtonDiv.innerHTML = '<button onclick="goToHomePage()">Home</button>';
     document.body.appendChild(homeButtonDiv);
 }
 
@@ -57,8 +37,50 @@ function goToHomePage() {
     window.location.href = 'home.html';
 }
 
+// Function to check if a user is an admin
+function isAdmin(username) {
+    const users = fetchUsers();
+    const user = users.find(user => user.username === username);
+    return user && user.role === 'admin';
+}
+
+// Event listener for DOM content loaded
+document.addEventListener('DOMContentLoaded', function () {
+    const loggedInUser = sessionStorage.getItem('loggedInUser');
+    const path = window.location.pathname;
+
+    if (loggedInUser) {
+        if (path.endsWith('index.html') || path.endsWith('signup.html') || path.endsWith('login.html')) {
+            window.location.href = 'home.html';
+        } else if (path.endsWith('admin.html') && !isAdmin(loggedInUser)) {
+            window.location.href = 'home.html';
+        }
+    } else {
+        if (path.endsWith('home.html') || path.endsWith('admin.html')) {
+            window.location.href = 'index.html';
+        }
+    }
+
+    if (path.endsWith('admin.html')) {
+        populateUserList();
+        populateUserSettings(loggedInUser);
+    }
+
+    if (path.endsWith('home.html')) {
+        displayUserData(loggedInUser);
+    }
+
+    if (path.endsWith('settings.html')) {
+        populateUserSettings(loggedInUser);
+    }
+
+    if (!path.endsWith('index.html') && !path.endsWith('signup.html') && !path.endsWith('login.html')) {
+        addHomeButton();
+    }
+});
+
 // Handle Sign Up
-document.getElementById('signupForm')?.addEventListener('submit', function (e) {
+document.getElementById('signupForm')?.addEventListener('submit', async function (e) {
     e.preventDefault();
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
@@ -69,40 +91,45 @@ document.getElementById('signupForm')?.addEventListener('submit', function (e) {
         return;
     }
 
+    const { hashedPassword } = await hashPassword(password);
+
     const user = {
         username: username,
-        password: password,
-        role: 'user', // Default role is user
+        hashedPassword: hashedPassword,
+        role: 'user',
         banned: false
     };
 
     users.push(user);
     saveUsers(users);
-    sessionStorage.setItem('loggedInUser', username); // Mark user as logged in for the session
+    sessionStorage.setItem('loggedInUser', username);
     window.location.href = 'home.html';
 });
 
 // Handle Login
-document.getElementById('loginForm')?.addEventListener('submit', function (e) {
+document.getElementById('loginForm')?.addEventListener('submit', async function (e) {
     e.preventDefault();
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
 
     const users = fetchUsers();
-    const user = users.find(user => user.username === username && user.password === password);
+    const user = users.find(user => user.username === username);
 
     if (user) {
+        const isValidPassword = await verifyPassword(password, user.hashedPassword);
+
+        if (!isValidPassword) {
+            alert('Invalid username or password');
+            return;
+        }
+
         if (user.banned) {
             alert('You are banned from this platform.');
             return;
         }
 
-        sessionStorage.setItem('loggedInUser', username); // Mark user as logged in for the session
-        if (user.role === 'admin') {
-            window.location.href = 'admin.html';
-        } else {
-            window.location.href = 'home.html';
-        }
+        sessionStorage.setItem('loggedInUser', username);
+        window.location.href = 'home.html';
     } else {
         alert('Invalid username or password');
     }
@@ -110,7 +137,7 @@ document.getElementById('loginForm')?.addEventListener('submit', function (e) {
 
 // Handle Sign Out
 document.getElementById('signOutButton')?.addEventListener('click', function () {
-    sessionStorage.removeItem('loggedInUser'); // Remove logged-in user session
+    sessionStorage.removeItem('loggedInUser');
     window.location.href = 'index.html';
 });
 
@@ -140,7 +167,7 @@ function populateUserSettings(username) {
     const user = users.find(user => user.username === username);
 
     const userSettings = document.getElementById('userSettings');
-    if (userSettings) { // Only populate if element exists (admin.html or settings.html)
+    if (userSettings) {
         userSettings.innerHTML = `
             <form id="userSettingsForm" class="admin-form">
                 <h2>User Settings</h2>
@@ -153,16 +180,16 @@ function populateUserSettings(username) {
             </form>
         `;
 
-        // Event listener for updating password
         document.getElementById('userSettingsForm').addEventListener('submit', function (e) {
             e.preventDefault();
             const newPassword = document.getElementById('newPassword').value;
-            user.password = newPassword;
-            saveUsers(users);
-            alert('Password updated successfully.');
+            hashPassword(newPassword).then(({ hashedPassword }) => {
+                user.hashedPassword = hashedPassword;
+                saveUsers(users);
+                alert('Password updated successfully.');
+            });
         });
 
-        // Event listener for deleting account
         document.getElementById('deleteAccountButton').addEventListener('click', function () {
             if (confirm('Are you sure you want to delete this account? This action cannot be undone.')) {
                 const updatedUsers = users.filter(u => u.username !== username);
@@ -180,7 +207,7 @@ function displayUserData(username) {
     const user = users.find(user => user.username === username);
 
     const userData = document.getElementById('userData');
-    if (userData) { // Only populate if element exists (home.html)
+    if (userData) {
         userData.innerHTML = `
             <h2>Welcome ${user.username}</h2>
             <p>Role: ${user.role}</p>
@@ -225,81 +252,3 @@ function deleteUser(username) {
         populateUserList();
     }
 }
-
-// Check if the user is an admin
-function isAdmin(username) {
-    const users = fetchUsers();
-    const user = users.find(user => user.username === username);
-    return user && user.role === 'admin';
-}
-
-// Function to hash a password
-async function hashPassword(password) {
-    const saltRounds = 10; // Number of salt rounds (higher is slower but more secure)
-    const salt = await bcrypt.genSalt(saltRounds);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    return { hashedPassword, salt };
-}
-
-// Function to verify a password against a hashed password and salt
-async function verifyPassword(password, hashedPassword, salt) {
-    const isValid = await bcrypt.compare(password, hashedPassword);
-    return isValid;
-}
-
-// Handle Sign Up
-document.getElementById('signupForm')?.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
-
-    let users = fetchUsers();
-    if (users.some(user => user.username === username)) {
-        alert('Username already exists');
-        return;
-    }
-
-    const { hashedPassword, salt } = await hashPassword(password);
-
-    const user = {
-        username: username,
-        hashedPassword: hashedPassword,
-        salt: salt,
-        role: 'user', // Default role is user
-        banned: false
-    };
-
-    users.push(user);
-    saveUsers(users);
-    alert('Account created successfully.');
-    window.location.href = 'index.html'; // Redirect to login page
-});
-
-// Handle Login
-document.getElementById('loginForm')?.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
-
-    const users = fetchUsers();
-    const user = users.find(user => user.username === username);
-
-    if (user) {
-        const isValidPassword = await verifyPassword(password, user.hashedPassword, user.salt);
-
-        if (!isValidPassword) {
-            alert('Invalid username or password');
-            return;
-        }
-
-        if (user.banned) {
-            alert('You are banned from this platform.');
-            return;
-        }
-
-        sessionStorage.setItem('loggedInUser', username); // Mark user as logged in for the session
-        window.location.href = 'home.html'; // Redirect to home page
-    } else {
-        alert('Invalid username or password');
-    }
-});
