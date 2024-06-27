@@ -1,319 +1,305 @@
-// Import bcrypt library for password hashing and verification
-const bcrypt = require('bcryptjs');
-
-// Function to fetch users from localStorage
-function fetchUsers() {
-    return JSON.parse(localStorage.getItem('users')) || [];
-}
-
-// Function to save users to localStorage
-function saveUsers(users) {
-    localStorage.setItem('users', JSON.stringify(users));
-}
-
-// Function to hash a password using bcrypt
-async function hashPassword(password) {
-    const saltRounds = 10;
-    const salt = await bcrypt.genSalt(saltRounds);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    return { hashedPassword, salt };
-}
-
-// Function to verify a password
-async function verifyPassword(password, hashedPassword) {
-    return await bcrypt.compare(password, hashedPassword);
-}
-
-// Function to add a Home button to the top right of the page
-function addHomeButton() {
-    const homeButtonDiv = document.createElement('div');
-    homeButtonDiv.classList.add('top-right-button');
-    homeButtonDiv.innerHTML = '<button onclick="goToHomePage()">Home</button>';
-    document.body.appendChild(homeButtonDiv);
-}
-
-// Function to redirect to home page
-function goToHomePage() {
-    window.location.href = 'home.html';
-}
-
-// Function to check if a user is an admin
-function isAdmin(username) {
-    const users = fetchUsers();
-    const user = users.find(user => user.username === username);
-    return user && user.role === 'admin';
-}
-
-// Function to fetch and apply the theme
-function applyTheme(theme) {
-    document.body.className = ''; // Clear existing classes
-    document.body.classList.add(theme);
-    localStorage.setItem('selectedTheme', theme);
-}
-
-// Function to get and apply the saved theme
-function getSavedTheme() {
-    return localStorage.getItem('selectedTheme') || 'light-theme';
-}
-
-// Function to reset the theme to default
-function resetTheme() {
-    localStorage.removeItem('selectedTheme');
-    applyTheme('light-theme');
-}
-
-// Add theme dropdown to the top right of the page
-function addThemeDropdown() {
-    const themeDropdownDiv = document.createElement('div');
-    themeDropdownDiv.classList.add('top-right-theme');
-    themeDropdownDiv.innerHTML = `
-        <select id="themeSelect" onchange="changeTheme()">
-            <option value="light-theme">Light</option>
-            <option value="dark-theme">Dark</option>
-            <option value="dyslexic-theme">Dyslexic</option>
-            <option value="colorblind-theme">Colorblind</option>
-        </select>
-    `;
-    document.body.appendChild(themeDropdownDiv);
-
-    // Set selected value based on the current theme
-    const currentTheme = getSavedTheme();
-    document.getElementById('themeSelect').value = currentTheme;
-}
-
-// Function to change theme based on selection
-function changeTheme() {
-    const selectedTheme = document.getElementById('themeSelect').value;
-    applyTheme(selectedTheme);
-}
-
-// Event listener for DOM content loaded
 document.addEventListener('DOMContentLoaded', function () {
-    const loggedInUser = sessionStorage.getItem('loggedInUser');
-    const path = window.location.pathname;
+    const signupForm = document.getElementById('signupForm');
+    const loginForm = document.getElementById('loginForm');
+    const signOutButton = document.getElementById('signOutButton');
+    const userListContainer = document.getElementById('userList');
+    const userSettingsContainer = document.getElementById('userSettings');
+    const themeSelectSettings = document.getElementById('themeSelectSettings');
 
-    if (loggedInUser) {
-        if (path.endsWith('index.html') || path.endsWith('signup.html') || path.endsWith('login.html')) {
-            window.location.href = 'home.html';
-        } else if (path.endsWith('admin.html') && !isAdmin(loggedInUser)) {
-            window.location.href = 'home.html';
-        } else {
-            applyTheme(getSavedTheme());
-            addThemeDropdown();
-        }
-    } else {
-        if (path.endsWith('home.html') || path.endsWith('admin.html')) {
-            window.location.href = 'index.html';
-        }
-        resetTheme();
-    }
-
-    if (path.endsWith('admin.html')) {
-        populateUserList();
-        populateUserSettings(loggedInUser);
-    }
-
-    if (path.endsWith('home.html')) {
-        displayUserData(loggedInUser);
-    }
-
-    if (path.endsWith('settings.html')) {
-        populateUserSettings(loggedInUser);
-        addThemeDropdown(); // Add theme dropdown to settings page
-    }
-
-    if (!path.endsWith('index.html') && !path.endsWith('signup.html') && !path.endsWith('login.html')) {
-        addHomeButton();
-    }
-});
-
-// Handle Sign Up
-document.getElementById('signupForm')?.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
-
+    // Initialize Users and Themes
     let users = fetchUsers();
-    if (users.some(user => user.username === username)) {
-        alert('Username already exists');
-        return;
-    }
+    let currentTheme = sessionStorage.getItem('theme') || 'light-theme';
+    document.body.className = currentTheme;
 
-    const { hashedPassword } = await hashPassword(password);
-
-    const user = {
-        username: username,
-        hashedPassword: hashedPassword,
-        role: 'user',
-        banned: false
-    };
-
-    users.push(user);
-    saveUsers(users);
-    sessionStorage.setItem('loggedInUser', username);
-    window.location.href = 'home.html';
-});
-
-// Handle Login
-document.getElementById('loginForm')?.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
-
-    const users = fetchUsers();
-    const user = users.find(user => user.username === username);
-
-    if (user) {
-        const isValidPassword = await verifyPassword(password, user.hashedPassword);
-
-        if (!isValidPassword) {
-            alert('Invalid username or password');
-            return;
-        }
-
-        if (user.banned) {
-            alert('You are banned from this platform.');
-            return;
-        }
-
-        sessionStorage.setItem('loggedInUser', username);
-        window.location.href = 'home.html';
-    } else {
-        alert('Invalid username or password');
-    }
-});
-
-// Handle Sign Out
-document.getElementById('signOutButton')?.addEventListener('click', function () {
-    sessionStorage.removeItem('loggedInUser');
-    resetTheme();
-    window.location.href = 'index.html';
-});
-
-// Populate User List in Admin Page
-function populateUserList() {
-    const users = fetchUsers();
-    const userList = document.getElementById('userList');
-
-    if (userList) {
-        userList.innerHTML = users.map(user => `
-            <div class="user-item">
-                <span>${user.username} (${user.role}) ${user.banned ? '(Banned)' : ''}</span>
-                <div class="user-actions">
-                    ${user.username !== 'admin' ? `<button onclick="toggleBanUser('${user.username}')">${user.banned ? 'Unban' : 'Ban'}</button>` : ''}
-                    ${user.username !== 'admin' && user.role !== 'admin' ? `<button onclick="makeAdmin('${user.username}')">Make Admin</button>` : ''}
-                    ${user.role !== 'admin' ? `<button onclick="deleteUser('${user.username}')">Delete</button>` : ''}
-                    ${user.username === sessionStorage.getItem('loggedInUser') ? `<button onclick="editUserSettings('${user.username}')">Settings</button>` : ''}
-                </div>
-            </div>
-        `).join('');
-    }
-}
-
-// Populate User Settings in Admin Panel and Settings Page
-function populateUserSettings(username) {
-    const users = fetchUsers();
-    const user = users.find(user => user.username === username);
-
-    const userSettings = document.getElementById('userSettings');
-    if (userSettings) {
-        userSettings.innerHTML = `
-            <form id="userSettingsForm" class="admin-form">
-                <h2>User Settings</h2>
-                <label for="username">Username:</label>
-                <input type="text" id="username" value="${user.username}" disabled>
-                <label for="newPassword">New Password:</label>
-                <input type="password" id="newPassword" required>
-                <label for="themeSelectSettings">Theme:</label>
-                <select id="themeSelectSettings">
-                    <option value="light-theme">Light</option>
-                    <option value="dark-theme">Dark</option>
-                    <option value="dyslexic-theme">Dyslexic</option>
-                    <option value="colorblind-theme">Colorblind</option>
-                </select>
-                <button type="submit">Update Password</button>
-                <button id="deleteAccountButton" type="button">Delete Account</button>
-            </form>
-        `;
-
-        // Set theme selection value
-        document.getElementById('themeSelectSettings').value = getSavedTheme();
-
-        // Add event listener for theme change
-        document.getElementById('themeSelectSettings').addEventListener('change', function () {
-            const selectedTheme = this.value;
-            applyTheme(selectedTheme);
-        });
-
-        document.getElementById('userSettingsForm').addEventListener('submit', function (e) {
+    // Handle Sign Up
+    if (signupForm) {
+        signupForm.addEventListener('submit', async function (e) {
             e.preventDefault();
-            const newPassword = document.getElementById('newPassword').value;
-            hashPassword(newPassword).then(({ hashedPassword }) => {
-                user.hashedPassword = hashedPassword;
-                saveUsers(users);
-                alert('Password updated successfully.');
-            });
-        });
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
 
-        document.getElementById('deleteAccountButton').addEventListener('click', function () {
-            if (confirm('Are you sure you want to delete this account? This action cannot be undone.')) {
-                const updatedUsers = users.filter(u => u.username !== username);
-                saveUsers(updatedUsers);
-                sessionStorage.removeItem('loggedInUser');
-                window.location.href = 'index.html';
+            if (users.some(user => user.username === username)) {
+                alert('Username already exists');
+                return;
+            }
+
+            const { hashedPassword } = await hashPassword(password);
+
+            const user = {
+                username: username,
+                hashedPassword: hashedPassword,
+                role: 'user',
+                banned: false
+            };
+
+            users.push(user);
+            saveUsers(users);
+            sessionStorage.setItem('loggedInUser', username);
+            window.location.href = 'home.html';
+        });
+    }
+
+    // Handle Login
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            const user = users.find(user => user.username === username);
+            if (user) {
+                const isValidPassword = await verifyPassword(password, user.hashedPassword);
+                if (!isValidPassword) {
+                    alert('Invalid username or password');
+                    return;
+                }
+                if (user.banned) {
+                    alert('You are banned from this platform.');
+                    return;
+                }
+                sessionStorage.setItem('loggedInUser', username);
+                window.location.href = 'home.html';
+            } else {
+                alert('Invalid username or password');
             }
         });
     }
-}
 
-// Display User Data on Home Page
-function displayUserData(username) {
-    const users = fetchUsers();
-    const user = users.find(user => user.username === username);
+    // Handle Sign Out
+    if (signOutButton) {
+        signOutButton.addEventListener('click', function () {
+            sessionStorage.removeItem('loggedInUser');
+            sessionStorage.removeItem('theme');
+            window.location.href = 'index.html';
+        });
+    }
 
-    const userData = document.getElementById('userData');
-    if (userData) {
-        userData.innerHTML = `
-            <h2>Welcome ${user.username}</h2>
-            <p>Role: ${user.role}</p>
-            <p>Status: ${user.banned ? 'Banned' : 'Active'}</p>
+    // Display User List on Admin Page
+    if (userListContainer) {
+        displayUsers();
+    }
+
+    // Display User Settings on Settings Page
+    if (userSettingsContainer) {
+        displayUserSettings();
+    }
+
+    // Handle Theme Selection
+    if (themeSelectSettings) {
+        themeSelectSettings.addEventListener('change', function () {
+            const selectedTheme = themeSelectSettings.value;
+            document.body.className = selectedTheme;
+            sessionStorage.setItem('theme', selectedTheme);
+        });
+    }
+
+    // Redirect if not logged in
+    const loggedInUser = sessionStorage.getItem('loggedInUser');
+    const path = window.location.pathname;
+    if (!loggedInUser && (path.endsWith('home.html') || path.endsWith('admin.html'))) {
+        window.location.href = 'index.html';
+    }
+
+    // Redirect if logged in
+    if (loggedInUser && (path.endsWith('index.html') || path.endsWith('signup.html') || path.endsWith('login.html'))) {
+        window.location.href = 'home.html';
+    }
+
+    // Fetch Users from Local Storage
+    function fetchUsers() {
+        const usersJSON = localStorage.getItem('users');
+        return usersJSON ? JSON.parse(usersJSON) : [];
+    }
+
+    // Save Users to Local Storage
+    function saveUsers(users) {
+        localStorage.setItem('users', JSON.stringify(users));
+    }
+
+    // Clear All Users
+    window.clearAllUsers = function () {
+        if (confirm('Are you sure you want to clear all users? This action cannot be undone.')) {
+            localStorage.removeItem('users');
+            users = [];
+            window.location.href = 'index.html';
+        }
+    };
+
+    // Display Users in Admin Panel
+    function displayUsers() {
+        userListContainer.innerHTML = '';
+        users.forEach((user, index) => {
+            const userItem = document.createElement('div');
+            userItem.className = 'user-item';
+            userItem.innerHTML = `
+                <span>${index + 1}. ${user.username} (${user.role})</span>
+                <div class="user-actions">
+                    <button onclick="toggleBanUser('${user.username}')">${user.banned ? 'Unban' : 'Ban'}</button>
+                    <button onclick="deleteUser('${user.username}')">Delete</button>
+                    <button onclick="makeAdmin('${user.username}')">Make Admin</button>
+                </div>
+            `;
+            userListContainer.appendChild(userItem);
+        });
+    }
+
+    // Display User Settings
+    function displayUserSettings() {
+        const loggedInUser = sessionStorage.getItem('loggedInUser');
+        if (!loggedInUser) {
+            alert('No user logged in.');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        const user = users.find(u => u.username === loggedInUser);
+        userSettingsContainer.innerHTML = `
+            <h2>Settings for ${user.username}</h2>
+            <label>Change Username:</label>
+            <input type="text" id="newUsername" value="${user.username}">
+            <button onclick="changeUsername('${user.username}')">Change Username</button>
+            <label>Change Password:</label>
+            <input type="password" id="newPassword" placeholder="New Password">
+            <button onclick="changePassword('${user.username}')">Change Password</button>
+            <button onclick="deleteAccount('${user.username}')">Delete Account</button>
+            <label>Change Theme:</label>
+            <select id="themeSelectSettings">
+                <option value="light-theme" ${currentTheme === 'light-theme' ? 'selected' : ''}>Light</option>
+                <option value="dark-theme" ${currentTheme === 'dark-theme' ? 'selected' : ''}>Dark</option>
+                <option value="dyslexic-theme" ${currentTheme === 'dyslexic-theme' ? 'selected' : ''}>Dyslexic</option>
+                <option value="colorblind-theme" ${currentTheme === 'colorblind-theme' ? 'selected' : ''}>Colorblind</option>
+            </select>
         `;
     }
-}
 
-// Edit User Settings
-function editUserSettings(username) {
-    populateUserSettings(username);
-}
+    // Change Username
+    window.changeUsername = function (oldUsername) {
+        const newUsername = document.getElementById('newUsername').value.trim();
+        if (!newUsername) {
+            alert('Username cannot be empty.');
+            return;
+        }
 
-// Ban/Unban User
-function toggleBanUser(username) {
-    const users = fetchUsers();
-    const user = users.find(user => user.username === username);
-    user.banned = !user.banned;
-    saveUsers(users);
-    populateUserList();
-}
+        if (users.some(user => user.username === newUsername)) {
+            alert('Username already taken.');
+            return;
+        }
 
-// Make User Admin
-function makeAdmin(username) {
-    const users = fetchUsers();
-    const user = users.find(user => user.username === username);
-    user.role = 'admin';
-    saveUsers(users);
-    populateUserList();
-}
+        const user = users.find(user => user.username === oldUsername);
+        user.username = newUsername;
+        saveUsers(users);
+        sessionStorage.setItem('loggedInUser', newUsername);
+        alert('Username changed successfully.');
+    };
 
-// Delete User
-function deleteUser(username) {
-    let users = fetchUsers();
-    users = users.filter(user => user.username !== username);
-    saveUsers(users);
-    alert(`User ${username} has been deleted.`);
-    if (username === sessionStorage.getItem('loggedInUser')) {
-        sessionStorage.removeItem('loggedInUser');
-        window.location.href = 'index.html';
-    } else {
-        populateUserList();
+    // Change Password
+    window.changePassword = async function (username) {
+        const newPassword = document.getElementById('newPassword').value;
+        if (!newPassword) {
+            alert('Password cannot be empty.');
+            return;
+        }
+
+        const user = users.find(user => user.username === username);
+        user.hashedPassword = (await hashPassword(newPassword)).hashedPassword;
+        saveUsers(users);
+        alert('Password changed successfully.');
+    };
+
+    // Delete Account
+    window.deleteAccount = function (username) {
+        const user = users.find(user => user.username === username);
+        if (user.role === 'admin') {
+            alert('Admin accounts cannot be deleted.');
+            return;
+        }
+
+        if (confirm('Are you sure you want to delete this account?')) {
+            users = users.filter(user => user.username !== username);
+            saveUsers(users);
+            sessionStorage.removeItem('loggedInUser');
+            alert('Account deleted successfully.');
+            window.location.href = 'index.html';
+        }
+    };
+
+    // Toggle Ban User
+    window.toggleBanUser = function (username) {
+        const user = users.find(user => user.username === username);
+        user.banned = !user.banned;
+        saveUsers(users);
+        displayUsers();
+    };
+
+    // Delete User
+    window.deleteUser = function (username) {
+        const user = users.find(user => user.username === username);
+        if (user.role === 'admin') {
+            alert('Admin accounts cannot be deleted.');
+            return;
+        }
+
+        if (confirm('Are you sure you want to delete this user?')) {
+            users = users.filter(user => user.username !== username);
+            saveUsers(users);
+            displayUsers();
+        }
+    };
+
+    // Make Admin
+    window.makeAdmin = function (username) {
+        const user = users.find(user => user.username === username);
+        user.role = 'admin';
+        saveUsers(users);
+        displayUsers();
+    };
+
+    // Password Hashing
+    async function hashPassword(password) {
+        const msgBuffer = new TextEncoder().encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashedPassword = hashArray.map(byte => byte.toString(const hashedPassword = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+        return { hashedPassword };
     }
-}
+
+    // Verify Password
+    async function verifyPassword(password, hashedPassword) {
+        const passwordHash = (await hashPassword(password)).hashedPassword;
+        return passwordHash === hashedPassword;
+    }
+
+    // Add Home Button to All Pages Except Index, Signup, and Login
+    const addHomeButton = () => {
+        if (!window.location.pathname.endsWith('index.html') &&
+            !window.location.pathname.endsWith('signup.html') &&
+            !window.location.pathname.endsWith('login.html')) {
+            const homeButton = document.createElement('button');
+            homeButton.textContent = 'Home';
+            homeButton.className = 'top-right-button';
+            homeButton.onclick = () => window.location.href = 'home.html';
+            document.body.appendChild(homeButton);
+        }
+    };
+
+    addHomeButton();
+
+    // Load all users across devices
+    function loadAllUsers() {
+        const usersJSON = localStorage.getItem('users');
+        return usersJSON ? JSON.parse(usersJSON) : [];
+    }
+
+    // Save users globally
+    function saveAllUsers(users) {
+        localStorage.setItem('users', JSON.stringify(users));
+    }
+
+    // Load users from any device
+    function updateUsers() {
+        users = loadAllUsers();
+    }
+
+    // Call updateUsers to ensure users list is updated
+    updateUsers();
+});
