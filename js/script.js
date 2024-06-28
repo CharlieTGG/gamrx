@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            const { hashedPassword } = await hashPassword(password);
+            const hashedPassword = await hashPassword(password);
 
             const user = {
                 username: username,
@@ -116,15 +116,6 @@ document.addEventListener('DOMContentLoaded', function () {
         localStorage.setItem('users', JSON.stringify(users));
     }
 
-    // Clear All Users
-    window.clearAllUsers = function () {
-        if (confirm('Are you sure you want to clear all users? This action cannot be undone.')) {
-            localStorage.removeItem('users');
-            users = [];
-            window.location.href = 'index.html';
-        }
-    };
-
     // Display Users in Admin Panel
     function displayUsers() {
         userListContainer.innerHTML = '';
@@ -201,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const user = users.find(user => user.username === username);
-        user.hashedPassword = (await hashPassword(newPassword)).hashedPassword;
+        user.hashedPassword = await hashPassword(newPassword);
         saveUsers(users);
         alert('Password changed successfully.');
     };
@@ -259,13 +250,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const msgBuffer = new TextEncoder().encode(password);
         const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashedPassword = hashArray.map(byte => byte.toString(const hashedPassword = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
-        return { hashedPassword };
+        const hashedPassword = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+        return hashedPassword;
     }
 
     // Verify Password
     async function verifyPassword(password, hashedPassword) {
-        const passwordHash = (await hashPassword(password)).hashedPassword;
+        const passwordHash = await hashPassword(password);
         return passwordHash === hashedPassword;
     }
 
