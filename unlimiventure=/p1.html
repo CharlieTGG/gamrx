@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Unlimiventure</title>
+    <style>
+        #game-container {
+            padding: 20px;
+            border: 1px solid white;
+            width: 450px;
+            height: 500px;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+            border-radius: 50px;
+        }
+
+        .choice-button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+        }
+
+        body, html {
+          height: 100%;
+          margin: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: white;
+          background-color: black;
+          text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <!-- Initial content will go here -->
+    </div>
+
+    <script>
+        // JavaScript to handle the game logic
+        function loadScene(sceneId) {
+            const scenes = {
+                start: {
+                    content: `
+                        <h1>Welcome to The Unlimiventure</h1>
+                        <p>You woke up one night, your alarm clock displayed the numbers, "02:57:09s" and something just didn't feel right. What do you do?</p>
+                        <button class="choice-button" onclick="loadScene('investigation')">Get investigating</button>
+                        <button class="choice-button" onclick="loadScene('backtosleep')">Go back to sleep</button>
+                        <h4>Recommended age rating: 12+</h4>
+                    `
+                },
+                investigation: {
+                    content: `
+                        <h1>Investigation</h1>
+                        <p>You felt like you were being watching by something, or someone, so you switched your lamp on and you saw something run out of your bedroom, something darker than the night sky. You didn't have enough time to get even a glimpse of it, but that didn't matter right now. You were scared out of your soul and you knew you had no choice, but to investigate further. Or did you?</p>
+                        <button class="choice-button" onclick="loadScene('investigation2')">Investigate further</button>
+                        <button class="choice-button" onclick="loadScene('runaway')">Run away from home</button>
+                        <button class="choice-button" onclick="loadScene('callpolice')">Call the police</button>
+                        <button class="choice-button" onclick="loadScene('backtosleep2')">Go back to sleep</button>
+                    `
+                },
+                backtosleep: {
+                    content: `
+                        <h1>Back to sleep</h1>
+                        <p>You tried and tried, but never succeeded. Eventually, you got so tired, you just passed out, right there, on the floor, and a few weeks later, you were reported dead. Rest In Pieces my fellow adventurer.</p>
+                        <button class="choice-button" onclick="loadScene('start')">Reset Game</button>
+                    `
+                },
+                investigation2: {
+                    content: `
+                        <h1>Investigate Further</h1>
+                        <p>You heard whispers coming from inside of the bathroom. Do you A: go inside, or B: look for a weapon?</p>
+                        <button class="choice-button" onclick="loadScene('goinside')">A</button>
+                        <button class="choice-button" onclick="loadScene('lookforweapon')">B</button>
+                    `
+                },
+                runaway: {
+                    content: `
+                        <h1>Run Away</h1>
+                        <p>Okay, let's be honest, you're a weird dude, like, why do you keep a baseball bat right behind your bed? Anyway, you picked up the nearest baseball bat and smashed your window, this alerted the psyco inside your house who then snatched the bat off you and knocked your down with it. Oops!</p>
+                        <button class="choice-button" onclick="loadScene('start')">Reset Game</button>
+                    `
+                },
+                callpolice: {
+                    content: `
+                        <h1>Call the Police</h1>
+                        <p>So you dialled 999 and here is your conversation; "Emergency services! Do you need Police, Fire or Ambulance?", "Police.", you wailed. "Please state your emergency.", "Can I please order a pepperoni pizza with a box of chips and a burger?", "Okay sir, your food is on the way!" Clever, you used the old pizza trick, but you were a bit stupid with it and the murderer wasn't thick. Yes, they got what they deserved, but you ended up with a broken neck. Good job!</p>
+                        <button class="choice-button" onclick="loadScene('start')">Reset Game</button>
+                    `
+                },
+                backtosleep2: {
+                    content: `
+                        <h1>Back to bed</h1>
+                        <p>Right, yeah, I can't really tell you what happened here, but all I can say is that you're deader than death Himself, nice!</p>
+                        <button class="choice-button" onclick="loadScene('start')">Reset Game</button>
+                    `
+                },
+                goinside: {
+                    content: `
+                        <h1>Inside the Bathroom</h1>
+                        <p>Yeah, you got shot dead immediately, smart!</p>
+                        <button class="choice-button" onclick="loadScene('start')">Reset Game</button>
+                    `
+                },
+                lookforweapon: {
+                    content: `
+                        <h1>Looking for a weapon</h1>
+                        <p>You silently approached your attic door, trying to make as less sound as possible. The door was very sqeaky but the killer didn't hear it, somehow. You paced upstairs and grabbed an axe from your toolbox. You ran downstairs, entered the bathroom and pounced on your abductor. Yay! You made it out alive! But now the cops are onto you.</p>
+                        <button class="choice-button" onclick="window.location.href = 'p2.html';">Part 2</button>
+                    `
+                },
+            };
+
+            const gameContainer = document.getElementById('game-container');
+            gameContainer.innerHTML = scenes[sceneId].content;
+        }
+
+        // Load the initial scene
+        loadScene('start');
+    </script>
+</body>
+</html>
