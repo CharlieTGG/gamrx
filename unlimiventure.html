@@ -34,6 +34,7 @@
     </style>
 </head>
 <body>
+    
     <div id="game-container">
         <!-- Initial content will go here -->
     </div>
@@ -108,15 +109,22 @@
                     content: `
                         <h1>Looking for a weapon</h1>
                         <p>You silently approached your attic door, trying to make as less sound as possible. The door was very sqeaky but the killer didn't hear it, somehow. You paced upstairs and grabbed an axe from your toolbox. You ran downstairs, entered the bathroom and pounced on your abductor. Yay! You made it out alive! But now the cops are onto you.</p>
-                        <button class="choice-button" onclick="loadScene('p2start')">Part 2</button>
+                        <button class="choice-button" onclick="loadScene('p2start')">Continue</button>
                     `
                 },
                 p2start: {
                     content: `
                         <h1>Welcome to the beginning of Part 2</h1>
                         <p>Yeah, you are wanted, everyone says you're the murderer, but we both know you aren't, he is! Who said it was a he? I don't know? You need to find a way out of this, if you hadn't've killed them, they would've killed you, who wants that, huh? Nobody, absolutely nobody (almost anyway.) This just isn't right! There should be a law against this! Nobody believes you anymore, even your own parents hate you now. What can you do? I'll leave that for you to decide poor little guy.</p>
-                        <button class="choice-button" onclick="loadScene('')">Choices coming soon</button>
-                        <button class="choice-button" onclick="window.location.href = 'p1.html';">Reset Game</button>
+                        <button class="choice-button" onclick="loadScene('p2start2')">Next</button>
+                    `
+                },
+                p2start2: {
+                    content: `
+                        <h1>Have you decided yet?</h1>
+                        <p>What are you going to do?</p>
+                        <button class="choice-button" onclick="loadScene('tryconvincepolice')">Try to convince to police that you're innocent</button>
+                        <button class="choice-button" onclick="loadScene('absolutelynothing')">Absolutely nothing</button>
                     `
                 },
             };
