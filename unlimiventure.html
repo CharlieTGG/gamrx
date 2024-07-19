@@ -22,31 +22,33 @@
         }
 
         body, html {
-          height: 100%;
-          margin: 0;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          color: white;
-          background-color: black;
-          text-align: center;
-          display: flex; 
-          flex-direction: column;
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            background-color: black;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        audio {
+            display: none;
         }
     </style>
 </head>
 <body>
-    
-<audio src="music.mp3" loop hidden autoplay></audio>
+    <audio id="background-music" src="music.mp3" loop autoplay></audio>
 
     <div id="game-container">
         <!-- Initial content will go here -->
     </div><br>
 
-<p>Credits to CO.AG Music on YouTube for the background music you are probably listening to right now.</p>
+    <p>Credits to CO.AG Music on YouTube for the background music you are probably listening to right now.</p>
 
     <script>
-        // JavaScript to handle the game logic
         function loadScene(sceneId) {
             const scenes = {
                 start: {
@@ -135,12 +137,45 @@
                 },
             };
 
+            // Save the current scene to localStorage
+            localStorage.setItem('currentScene', sceneId);
+
             const gameContainer = document.getElementById('game-container');
             gameContainer.innerHTML = scenes[sceneId].content;
         }
 
-        // Load the initial scene
-        loadScene('start');
+        function saveAudioTime() {
+            const audio = document.getElementById('background-music');
+            localStorage.setItem('audioTime', audio.currentTime);
+        }
+
+        function loadAudioTime() {
+            const audio = document.getElementById('background-music');
+            const savedTime = localStorage.getItem('audioTime');
+            if (savedTime !== null) {
+                audio.currentTime = savedTime;
+            }
+            audio.play();
+        }
+
+        function loadCurrentScene() {
+            const currentScene = localStorage.getItem('currentScene');
+            if (currentScene !== null) {
+                loadScene(currentScene);
+            } else {
+                loadScene('start');
+            }
+        }
+
+        // Load the initial scene and set up the audio time
+        loadCurrentScene();
+        loadAudioTime();
+
+        // Save the audio time periodically
+        setInterval(saveAudioTime, 1000);
+
+        // Save the audio time before the window unloads
+        window.addEventListener('beforeunload', saveAudioTime);
     </script>
 </body>
 </html>
