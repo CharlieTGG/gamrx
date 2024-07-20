@@ -30,6 +30,8 @@ nav {
     background: blueviolet;
     height: 80px;
     width: 100%;
+    z-index: 2;
+    position: relative;
 }
 
 label.logo {
@@ -110,6 +112,7 @@ h1 {
         left: -100%;
         text-align: center;
         transition: all .5s;
+        z-index: 1; /* Ensure the menu is behind the nav bar */
     }
     nav ul li {
         display: block;
@@ -125,6 +128,7 @@ h1 {
     }
     #check:checked ~ ul {
         left: 0;
+        z-index: 2; /* Bring the menu to the front when checked */
     }
 }
 
@@ -140,6 +144,11 @@ p {
     font-size: 20px;
     font-family: Georgia, 'Times New Roman', Times, serif;
     color: aquamarine;
+}
+
+audio {
+    z-index: 0;
+    position: relative;
 }
 
 .credit {
