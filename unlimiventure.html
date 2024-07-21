@@ -144,20 +144,6 @@
             gameContainer.innerHTML = scenes[sceneId].content;
         }
 
-        function saveAudioTime() {
-            const audio = document.getElementById('background-music');
-            localStorage.setItem('audioTime', audio.currentTime);
-        }
-
-        function loadAudioTime() {
-            const audio = document.getElementById('background-music');
-            const savedTime = localStorage.getItem('audioTime');
-            if (savedTime !== null) {
-                audio.currentTime = savedTime;
-            }
-            audio.play();
-        }
-
         function loadCurrentScene() {
             const currentScene = localStorage.getItem('currentScene');
             if (currentScene !== null) {
@@ -167,15 +153,8 @@
             }
         }
 
-        // Load the initial scene and set up the audio time
+        // Load the initial scene
         loadCurrentScene();
-        loadAudioTime();
-
-        // Save the audio time periodically
-        setInterval(saveAudioTime, 1000);
-
-        // Save the audio time before the window unloads
-        window.addEventListener('beforeunload', saveAudioTime);
     </script>
 </body>
 </html>
