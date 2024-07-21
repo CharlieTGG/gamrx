@@ -16,6 +16,8 @@ nav {
 
 a {
     text-decoration: none;
+    color: azure;
+    text-size: 46px;
 }
 
 /* Logo styling within nav */
