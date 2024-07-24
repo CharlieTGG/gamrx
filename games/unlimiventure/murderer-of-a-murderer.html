@@ -135,6 +135,50 @@
                         <button class="choice-button" onclick="loadScene('absolutelynothing')">Absolutely nothing</button>
                     `
                 },
+                tryconvincepolice: {
+                    content: `
+                        <h1>Convincing the Police</h1>
+                        <p>Alright, good idea, although it may sound stupid, it's actually quite a good idea. So yeah, you called 999 and you were asked a few questions. They actually believed you! You are saved! You were then asked by the woman on the phone if you want to go on a date with her! What do you reply?</p>
+                        <button class="choice-button" onclick="loadScene('datepoliceno')">No, thanks!</button>
+                        <button class="choice-button" onclick="loadScene('datepoliceyes')">Yes!</button>
+                    `
+                },
+                absolutelynothing: {
+                    content: `
+                        <h1>Absolutely Nothing</h1>
+                        <p>Come on man! You can't just do thing about it! Pick something else, anything else.</p>
+                        <button class="choice-button" onclick="loadScene('p2start2')">Go back</button>
+                    `
+                },
+                datepoliceno: {
+                    content: `
+                        <h1>"No, thanks!"</h1>
+                        <p>That was your answer, you still had chance to go out with her, would you like to change your answer?</p>
+                        <button class="choice-button" onclick="loadScene('datepoliceyes2')">Yes</button>
+                        <button class="choice-button" onclick="loadScene('datepoliceno2')">No</button>
+                    `
+                },
+                datepoliceyes: {
+                    content: `
+                        <h1>"Yes!"</h1>
+                        <p>That was your answer, you made a girly very happy, as your took her to the movies and then order McDonald's. You let her drive your car to her house, which was for some reason the police station, and then she arrested you, looks like not even she cared about you.</p>
+                        <button class="choice-button" onclick="loadScene('start')">Reset Game</button>
+                    `
+                },
+                datepoliceyes2: {
+                    content: `
+                        <h1>"Um, yes! That's what I mean't, yes!"</h1>
+                        <p>That was your answer, she told you she didn't want to anymore and therefore you were left without a girlfriend. Okay?</p>
+                        <button class="choice-button" onclick="loadScene('datepoliceyes2')">Continue without a girlfriend</button>
+                    `
+                },
+                datepoliceno2: {
+                    content: `
+                        <h1>"I said no!"</h1>
+                        <p>That was your answer, no, just no. Wow, you insulted a policewoman, you tracked your location and then got you arrested, why, just why?</p>
+                        <button class="choice-button" onclick="loadScene('start')">Reset Game</button>
+                    `
+                },
             };
 
             // Save the current scene to localStorage
