@@ -99,6 +99,12 @@ nav #check:checked ~ ul {
     left: 0;
 }
 
+@media screen and (max-width: 300px) {
+    nav label.logo {
+      display: none;
+  }
+}
+
 body {
     color: white;
     text-align: center;
@@ -121,7 +127,7 @@ h1 {
 }
 
 li {
-    text-align: left;
+    text-align: right;
     font-size: 26px;
 }
 
@@ -136,7 +142,11 @@ audio {
 }
 
 .credit {
-    color: grey;
+    color: rgb(201, 201, 201);
+}
+
+.blackbgfill {
+    background-color: black;
 }
 
 img {
