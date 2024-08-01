@@ -99,7 +99,7 @@ nav #check:checked ~ ul {
     left: 0;
 }
 
-@media screen and (max-width: 300px) {
+@media screen and (max-width: 600px) {
     nav label.logo {
       display: none;
   }
