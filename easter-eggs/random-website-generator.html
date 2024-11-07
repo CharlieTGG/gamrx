@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Website Generator</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="goToRandomWebsite()">Go to Random Website</button>
+
+    <script>
+        function goToRandomWebsite() {
+            // Array of website URLs
+            const websites = [
+                'https://www.google.com',
+                'https://www.wikipedia.org',
+                'https://www.reddit.com',
+                'https://www.github.com',
+                'https://www.youtube.com',
+                'https://www.itch.io',
+                'https://www.duolingo.com',
+                'https://www.google.co.uk',
+                'https://www.namecheap.com',
+                'https://www.example.com',
+                'https://www.voicemod.net',
+                'https://tuna.voicemod.net',
+                'https://www.godaddy.com',
+                'https://www.bing.com',
+                'https://www.duckduckgo.com',
+                'https://www.opera.com',
+                'https://www.roblox.com',
+                'https://www.microsoft.com',
+                'https://www.minecraft.net',
+                'https://www.radio.garden',
+                'https://www.neal.fun',
+                'https://www.adobe.com',
+                'https://www.corel.com',
+                'https://www.hole-io.com',
+                'https://charlietgg.github.io/freestuff_lol',
+                'https://charlietgg.github.io/trevorhendersonwiki',
+                'https://charlietgg.github.io/gamrx',
+                'https://www.photopea.com',
+                'https://www.github.dev',
+                'https://www.ballmemes.com',
+                'https://www.temu.com',
+                'https://www.x.com',
+                'https://www.rizzup.net',
+                'https://www.apple.com',
+                'https://www.gmail.com',
+                'https://www.proton.com',
+                'https://www.tor.onion',
+                'https://www.mimo.org',
+                'https://www.chatgpt.com',
+                'https://www.tabnine.com',
+                // Add more website URLs here
+            ];
+
+            // Select a random website
+            const randomWebsite = websites[Math.floor(Math.random() * websites.length)];
+
+            // Open the random website in a new tab
+            window.open(randomWebsite, '_blank');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Unlimiventure</title>
+    <style>
+        #game-container {
+            padding: 20px;
+            border: 1px solid black;
+            width: 450px;
+            height: 500px;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+            border-radius: 50px;
+        }
+
+        .choice-button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            background-color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <h1>Welcome The Unlimiventure</h1>
+        <p>What story are you interested in trying out today?</p>
+        <button onclick="window.location.href='./murderer-of-a-murderer'">Murderer of a Murderer</button>
+    </div><br>
+
+    <p>By the way, The Unlimiventure saves each of your chosen story's data so never worry about losing your progress.</p>
+</body>
+</html>

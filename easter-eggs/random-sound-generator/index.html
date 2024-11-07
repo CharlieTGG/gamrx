@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Sound Generator</title>
+</head>
+<body>
+    <h1>Random Sound Generator</h1>
+    <button onclick="playRandomSound()">Play Random Sound</button>
+    <audio id="audioPlayer" controls></audio>
+
+    <script>
+        function playRandomSound() {
+            // Array of sound file names
+            const sounds = [
+                'chokeonspit.mp3',
+                'diediedie.mp3',
+                'ermwhatthesigma.mp3',
+                'ermwhatthesigmafull.mp3',
+                'evil-bye-bye.mp3',
+                'fart.mp3',
+                'funnydoglaugh.mp3',
+                'get-out.mp3',
+                'hehefu.mp3',
+                'idc.mp3',
+                'loudrobloxnostalgicsong.mp3',
+                'mewingsong.mp3',
+                'mewingsongextended.mp3',
+                'obungasound.mp3',
+                'tasty.mp3',
+                'wrizzsfx.mp3',
+                // Add more sound file names here
+            ];
+
+            // Select a random sound
+            const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
+
+            // Set up the audio element
+            const audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.src = `sounds/${randomSound}`;
+            audioPlayer.play();
+        }
+
+        // Play a random sound on page load
+        window.onload = playRandomSound;
+    </script>
+</body>
+</html>
