@@ -114,6 +114,20 @@ div.content-container {
     img.image {
         width: 250px;
     }
+    
+    img.play-btn {
+        width: 20px;
+    }
+
+    a.download-page-btn {
+        background-color: #0088ff;
+        border-radius: 10px;
+        color: white;
+    }
+    
+    a.download-page-btn:hover {
+        text-decoration: none;
+    }
 
     div.content-container {
         position: fixed;
@@ -123,9 +137,9 @@ div.content-container {
         font-family: 'Courier New', Courier, monospace;
         text-align: center;
         width: 100%;
-        max-width: 19pc;
+        max-width: 18.5pc;
         height: 100%;
-        max-height: 720px;
+        max-height: 640px;
         padding: 20px;
         background-color: rgb(0, 0, 0);
         overflow: auto;
