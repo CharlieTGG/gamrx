@@ -7,6 +7,7 @@ const pages = [
     'easter-eggs/yourmom.html',
     'easter-eggs/yourdad.html',
     'easter-eggs/random-sound-generator',
+    'easter-eggs/guess-the-backrooms-level-name-by-number',
   ];
   
   // Function to select a random URL and redirect the user
