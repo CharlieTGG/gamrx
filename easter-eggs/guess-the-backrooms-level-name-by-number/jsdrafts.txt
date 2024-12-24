@@ -1,0 +1,9 @@
+document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+          // Tab is no longer visible
+          console.log("User navigated away!");
+        } else if (document.visibilityState === "visible") {
+          // Tab is now visible again
+          window.location.href = "https://backrooms-freewriting.fandom.com/wiki/You_Cheated"; // Redirect to a different page
+        }
+      });

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backrooms Quiz (HARD)</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body> 
+
+    <div id="quiz_container">
+
+        <h1 id="level-title">Level 0:</h1>
+
+        <div id="input-wrapper">
+
+            <span>"</span>
+            <span id="input-display"></span>
+            <span class="flashing-line">|</span>
+            <span>"</span>
+
+        </div>
+
+        <div id="controls">
+
+            <button id="done-button">Done</button>
+            <button id="skip-button">Skip</button>
+
+        </div>
+
+        <p id="time-left">You have 30 second(s) left.</p>
+
+        <div id="score-info">
+
+            <span id="score">0/0</span>
+            <span id="timer">Time taken: 0.00s</span>
+
+        </div>
+
+        <div id="additional-controls">
+
+            <button id="more-time-button">Need more time to think?</button>
+            <button id="give-up-button">Give up yet?</button>
+
+        </div>
+
+    </div>
+
+    <div id="end-screen" style="display: none;">
+        <p id="final-score"></p>
+        <p id="final-time"></p>
+      </div>      
+
+</body>
+<script src="script.js"></script>
+<script src="defaults.js"></script>
+<script>
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+          // Tab is no longer visible
+          console.log("User navigated away!");
+        } else if (document.visibilityState === "visible") {
+          // Tab is now visible again
+          window.location.href = "you-cheated.html"; // Redirect to a different page
+        }
+      });
+</script>
+</html>
